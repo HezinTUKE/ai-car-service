@@ -3,7 +3,6 @@ import traceback
 
 from fastapi import APIRouter
 
-from application.handlers.rag_handler import RagHandler
 from application.indexes.rag_index import RagIndex
 
 from application.controllers import OPENSEARCH_CONTROLLER_PREFIX
@@ -14,9 +13,6 @@ class OpensearchController:
     router = APIRouter(prefix=f"/{OPENSEARCH_CONTROLLER_PREFIX}", tags=[OPENSEARCH_CONTROLLER_PREFIX])
 
     INDEX_MAPPER = {OpensearchIndexes.RAG_INDEX: RagIndex}
-    INDEX_FILL_MAPPER = {
-        OpensearchIndexes.RAG_INDEX: RagHandler.fill_rag_index,
-    }
 
     @staticmethod
     @router.post(path=f"/create-index")

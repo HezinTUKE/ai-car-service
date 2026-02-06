@@ -2,10 +2,10 @@ from dataclasses import dataclass
 
 from dataclasses_json import dataclass_json, Undefined, DataClassJsonMixin
 
-from application.enums.services.country import Country
-from application.enums.services.currency import Currency
-from application.enums.services.metadata import FuncMetadata
-from application.enums.services.offer_types import OfferType
+from application.enums.country import Country
+from application.enums.currency import Currency
+from application.enums.metadata import FuncMetadata
+from application.enums.offer_types import OfferType
 
 
 @dataclass_json(undefined=Undefined.EXCLUDE)

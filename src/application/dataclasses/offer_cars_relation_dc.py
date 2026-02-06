@@ -3,12 +3,11 @@ from dataclasses import dataclass, field
 
 from dataclasses_json import dataclass_json, Undefined, DataClassJsonMixin
 
-from application.enums.services.car_brands import CarBrands
-from application.enums.services.car_types import CarType
-from application.enums.services.country import Country
-from application.enums.services.currency import Currency
-from application.enums.services.offer_types import OfferType
-from application.models import OfferModel, OfferCarCompatibilityModel, ServiceModel
+from application.enums.car_brands import CarBrands
+from application.enums.car_types import CarType
+from application.enums.country import Country
+from application.enums.currency import Currency
+from application.enums.offer_types import OfferType
 
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
@@ -64,22 +63,5 @@ class ServiceDC(DataClassJsonMixin):
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
-class OfferCarRelationDC(DataClassJsonMixin):
-    offer: OfferModel
-    car_compatibility_models: list[OfferCarCompatibilityModel] = field(default_factory=list)
-
-
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass
-class OfferCarRelationsListDC(DataClassJsonMixin):
-    service_model: ServiceModel
-    offer_car_relations: list[OfferCarRelationDC] = field(default_factory=list)
-
-    def get_offers(self):
-        return [relation.offer for relation in self.offer_car_relations]
-
-    def get_car_compatibility_models(self):
-        compatibility_models = []
-        for relation in self.offer_car_relations:
-            compatibility_models.extend(relation.car_compatibility_models)
-        return compatibility_models
+class EventData(DataClassJsonMixin):
+    services: list[ServiceDC] = field(default_factory=list)

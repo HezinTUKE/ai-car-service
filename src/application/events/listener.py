@@ -1,8 +1,11 @@
+import json
+
 from aio_pika import connect_robust
-from aio_pika.abc import AbstractMessage, AbstractChannel, AbstractRobustConnection
+from aio_pika.abc import AbstractChannel, AbstractRobustConnection, AbstractIncomingMessage
 
 from application import config
 from application.enums.rabbit_routers import RabbitRouter
+from application.handlers.rag_handler import RagHandler
 
 mb_config = config.rabbitmq
 
@@ -30,9 +33,16 @@ class RabbitProcessorListener:
 
         await queue.consume(self.process_message)
 
-    async def process_message(self, message: AbstractMessage):
-        pass
-
     async def disconnect(self):
         await self.channel.close()
         await self.connection.close()
+
+    @staticmethod
+    async def process_message(message: AbstractIncomingMessage):
+        async with message.process():
+            event_data = json.loads(message.body.decode())
+            match message.routing_key.split(".", 1)[1]:
+                case RabbitRouter.PROCESS_SERVICES.value:
+                    await RagHandler.process_service_rag_event(event_data)
+                case _:
+                    pass

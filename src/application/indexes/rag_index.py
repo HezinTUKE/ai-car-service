@@ -1,5 +1,5 @@
 from application.indexes.base_index import BaseIndex
-from application.enums.services.indexes import OpensearchIndexes
+from application.enums.indexes import OpensearchIndexes
 
 
 class RagIndex(BaseIndex):

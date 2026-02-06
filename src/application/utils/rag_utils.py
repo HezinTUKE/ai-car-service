@@ -134,7 +134,6 @@ class RagUtils:
         return json.loads(res)
 
     @classmethod
-    # async def update_or_create_rag_idx(cls, offer_service_relation: OfferCarRelationsListDC):
     async def update_or_create_rag_idx(cls, service: ServiceDC):
         content = f"""Service Name: {service.name}\n\nDescription: {service.description}\n\nAddress: {service.original_full_address}\n"""
         offers: [OfferDC] = service.offers
