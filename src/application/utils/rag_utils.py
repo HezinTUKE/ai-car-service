@@ -188,6 +188,11 @@ class RagUtils:
         )
 
     @classmethod
+    async def update_or_create_rag_idx_v2(cls, service: ServiceDC):
+        pass
+
+
+    @classmethod
     def dict_cleaner(cls, obj: dict | list) -> dict | list:
         empty_values = (None, {}, [], "")
 

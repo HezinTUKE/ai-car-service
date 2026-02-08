@@ -3,16 +3,20 @@ import traceback
 
 from fastapi import APIRouter
 
-from application.indexes.rag_index import RagIndex
+from application.indexes.offer_index import OfferIndex
 
 from application.controllers import OPENSEARCH_CONTROLLER_PREFIX
 from application.enums.indexes import OpensearchIndexes
+from application.indexes.service_index import ServiceIndex
 
 
 class OpensearchController:
     router = APIRouter(prefix=f"/{OPENSEARCH_CONTROLLER_PREFIX}", tags=[OPENSEARCH_CONTROLLER_PREFIX])
 
-    INDEX_MAPPER = {OpensearchIndexes.RAG_INDEX: RagIndex}
+    INDEX_MAPPER = {
+        OpensearchIndexes.SERVICE_INDEX: ServiceIndex,
+        OpensearchIndexes.OFFER_INDEX: OfferIndex,
+    }
 
     @staticmethod
     @router.post(path=f"/create-index")
