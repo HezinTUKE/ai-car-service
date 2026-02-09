@@ -3,19 +3,19 @@ from application.dataclasses.rag_os_filter import *
 from application.dataclasses.user_point import UserPoint
 from application.enums.metadata import FuncMetadata
 from application.indexes.rag_index import RagIndex
-from application.schemas.service_schemas.response_schemas.rag_schema import RagResponseItemSchema, RagResponseSchema
+from application.schemas.response_schemas.rag_schema import RagResponseItemSchema, RagResponseSchema
 from application.utils.ai_heplers import question_encoding, embedding
 
 
 class RagUtils:
     @classmethod
-    async def rag_query(cls, question: str):
+    async def rag_query(cls, question: str, user_point: UserPoint = None) -> dict:
         result = RagResponseSchema(data=[])
 
         question_metadata = question_encoding(question)
         question_metadata = QuestionMetadataDc.from_dict(question_metadata)
 
-        generated_query = cls.generate_os_query(question, question_metadata)
+        generated_query = cls.generate_os_query(question, question_metadata, user_point)
 
         res = await RagIndex.retrieve_by_query(query=generated_query)
 
