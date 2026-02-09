@@ -83,3 +83,8 @@ OfferType (choose the closest match):
 - TOWING
 
 If no suitable value exists, use null."""
+
+
+translate_prompt = """
+Translate the following text to English, keeping meaning, style, and professional terminology, and return ONLY the translated text without any explanations or extra formatting.
+"""

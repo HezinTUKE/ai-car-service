@@ -8,6 +8,7 @@ from application.enums.car_types import CarType
 from application.enums.country import Country
 from application.enums.currency import Currency
 from application.enums.offer_types import OfferType
+from application.maps.offer_to_human_text import OFFER_TYPE_TO_TEXT
 
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
@@ -34,7 +35,11 @@ class OfferDC(DataClassJsonMixin):
     estimated_duration_minutes: int = 1
     created_at: int = None
     updated_at: int = None
+    offer_to_human_readable: str = ""
     offer_car_compatibility: list[OfferCarCompatibilityModelDC] = field(default_factory=list)
+
+    def __post_init__(self):
+        self.offer_to_human_readable = OFFER_TYPE_TO_TEXT.get(self.offer_type, "unknown offer type")
 
 
 @dataclass_json(undefined=Undefined.EXCLUDE)

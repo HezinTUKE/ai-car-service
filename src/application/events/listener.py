@@ -39,10 +39,13 @@ class RabbitProcessorListener:
 
     @staticmethod
     async def process_message(message: AbstractIncomingMessage):
-        async with message.process():
-            event_data = json.loads(message.body.decode())
-            match message.routing_key.split(".", 1)[1]:
-                case RabbitRouter.PROCESS_SERVICES.value:
-                    await RagHandler.process_service_rag_event(event_data)
-                case _:
-                    pass
+        async with message.process(requeue=False):
+            try:
+                event_data = json.loads(message.body.decode())
+                match message.routing_key.split(".", 1)[1]:
+                    case RabbitRouter.PROCESS_SERVICES.value:
+                        await RagHandler.process_service_rag_event(event_data)
+                    case _:
+                        pass
+            except json.JSONDecodeError:
+                return

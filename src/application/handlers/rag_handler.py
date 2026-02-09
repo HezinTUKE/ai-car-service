@@ -1,3 +1,5 @@
+import asyncio
+
 from application.dataclasses.offer_cars_relation_dc import EventData
 from application.handlers.offer_handler import OfferHandler
 from application.handlers.service_handler import ServiceHandler
@@ -16,6 +18,8 @@ class RagHandler:
 
         for service in event_data.services:
             await service_handler.create_document(service)
-            offer_handler = OfferHandler(service.service_id, service.service_id)
+            offer_handler = OfferHandler(service.name, service.service_id, service.city, service.country)
             for offer in service.offers:
                 await offer_handler.create_document(offer)
+
+            await asyncio.sleep(0.01)

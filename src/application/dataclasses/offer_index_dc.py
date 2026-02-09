@@ -13,7 +13,7 @@ class OfferIndexDC(DataClassJsonMixin):
     car_types: list[str]
     embedding_text: str = ""
 
-    def format_embedding_text(self, service_name: str, city: str, country: str, offer_description: str):
-        self.embedding_text = (f"{service_name} offers a {self.offer_type} service in {city.title()}, {country.title()}."
-                               f"The offer description description - {offer_description}. The price of service is {self.price} {self.currency}."
+    def format_embedding_text(self, service_name: str, city: str, country: str, offer_description: str, human_readable_offer_type: str = ""):
+        self.embedding_text = (f"{service_name} offers a {human_readable_offer_type} service in {city.title()}, {country.title()}."
+                               f"The service includes {offer_description} The price of service is {self.price} {self.currency}."
                                f"This offer is suitable for {', '.join(self.car_brands)}, including {', '.join(self.car_types)}.")

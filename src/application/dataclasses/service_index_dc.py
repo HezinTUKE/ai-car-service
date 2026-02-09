@@ -15,6 +15,6 @@ class ServiceIndexDC(DataClassJsonMixin):
     original_full_address: str
     embedding_text: str = ""
 
-    def __post_init__(self):
+    def format_embedding_text(self, translated_description: str = ""):
         self.embedding_text = (f"{self.name} is a car service located in {self.city}, {self.country.value}. "
-                               f"The service address is {self.original_full_address}. Description: {self.description}")
+                               f"The service address is {self.original_full_address} Description: {translated_description}")

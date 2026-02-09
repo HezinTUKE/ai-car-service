@@ -1,16 +1,10 @@
-import json
-from collections import defaultdict
-
-from requests import post
 from application.dataclasses.question_metadata_dc import QuestionMetadataDc
 from application.dataclasses.rag_os_filter import *
-from application.dataclasses.offer_cars_relation_dc import ServiceDC, OfferDC
 from application.dataclasses.user_point import UserPoint
 from application.enums.metadata import FuncMetadata
-from application.enums.rag_source import RagSource
 from application.indexes.rag_index import RagIndex
 from application.schemas.service_schemas.response_schemas.rag_schema import RagResponseItemSchema, RagResponseSchema
-from application.utils.globals import extract_question_data_prompt
+from application.utils.ai_heplers import question_encoding, embedding
 
 
 class RagUtils:
@@ -18,7 +12,7 @@ class RagUtils:
     async def rag_query(cls, question: str):
         result = RagResponseSchema(data=[])
 
-        question_metadata = cls.question_understanding(question)
+        question_metadata = question_encoding(question)
         question_metadata = QuestionMetadataDc.from_dict(question_metadata)
 
         generated_query = cls.generate_os_query(question, question_metadata)
@@ -43,7 +37,7 @@ class RagUtils:
     def generate_os_query(
         cls, question: str, question_metadata: QuestionMetadataDc, user_point: UserPoint = None
     ) -> dict:
-        query_vector = cls.embedding(question)
+        query_vector = embedding(question)
 
         query_body = RagOsFilterRequestBody()
         query_body.query.bool.must.append(
@@ -107,90 +101,6 @@ class RagUtils:
             )
 
         return cls.dict_cleaner(query_body.to_dict())
-
-    @classmethod
-    def embedding(cls, text: str):
-        normalized_text = "".join(text.strip().strip())
-        response = post(
-            url="http://localhost:11434/api/embeddings", json={"model": "nomic-embed-text", "prompt": normalized_text}
-        )
-        return response.json()["embedding"]
-
-    @classmethod
-    def question_understanding(cls, question: str):
-        request = post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "llama3:8b",
-                "prompt": f"{extract_question_data_prompt}\nQuestion: {question}",
-                "stream": False,
-            },
-        )
-
-        if request.status_code != 200:
-            return None
-
-        res = request.json()["response"]
-        return json.loads(res)
-
-    @classmethod
-    async def update_or_create_rag_idx(cls, service: ServiceDC):
-        content = f"""Service Name: {service.name}\n\nDescription: {service.description}\n\nAddress: {service.original_full_address}\n"""
-        offers: [OfferDC] = service.offers
-
-        if offers:
-            content += f"Offers:\n"
-
-        for idx, offer in enumerate(offers):
-            offer: OfferDC
-            offer_content = f"- Offer {idx+1}/{len(offers)}:\n Offer type: {offer.offer_type.name}\n Description: {offer.description}\n, Price: {offer.base_price} {offer.currency.name}\n"
-            compatible_dict = defaultdict(list)
-
-            for car_relation in offer.offer_car_compatibility:
-                compatible_dict[car_relation.car_type.name].append(car_relation.car_brand.name)
-
-            compatible_content = "\n".join(
-                f"""Car type: {key}, Car Brands: {",".join(brands)}""" for key, brands in compatible_dict.items()
-            )
-            offer_content += f"Compatible Cars:\n {compatible_content}\n\n"
-
-            content += offer_content
-
-        await RagIndex.create_or_update_document(
-            document_id=service.service_id,
-            document_body={
-                "content": content,
-                "embedding": RagUtils.embedding(content),
-                "source": RagSource.POSTGRESQL.value,
-                "name": service.name,
-                "point": {"lat": service.latitude, "lon": service.longitude},
-                "city": service.city,
-                "country": service.country.name,
-                "offers": [
-                    {
-                        "base_price": offer.base_price,
-                        "sale": offer.sale,
-                        "currency": offer.currency.name,
-                        "offer_type": offer.offer_type.name,
-                        "car_compatibilities": [
-                            {
-                                "car_type": car_relation.car_type.name,
-                                "car_brand": car_relation.car_brand.name,
-                            }
-                            for car_relation in offer.offer_car_compatibility
-                            if car_relation.offer_id == offer.offer_id
-                        ],
-                    }
-                    for offer in offers
-                    if offer
-                ],
-            },
-        )
-
-    @classmethod
-    async def update_or_create_rag_idx_v2(cls, service: ServiceDC):
-        pass
-
 
     @classmethod
     def dict_cleaner(cls, obj: dict | list) -> dict | list:
