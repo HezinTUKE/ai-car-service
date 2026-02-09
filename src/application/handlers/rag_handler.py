@@ -10,7 +10,9 @@ from application.utils.rag_utils import RagUtils
 class RagHandler:
     @classmethod
     async def rag_query(cls, question: str, user_latitude: float = None, user_longitude: float = None):
-        user_point = UserPoint(latitude=user_latitude, longitude=user_longitude) if user_latitude and user_longitude else None
+        user_point = (
+            UserPoint(latitude=user_latitude, longitude=user_longitude) if user_latitude and user_longitude else None
+        )
         return await RagUtils.rag_query(question, user_point)
 
     @classmethod

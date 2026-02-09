@@ -14,10 +14,7 @@ class ServiceHandler(IndexAbstraction):
         index_dc = ServiceIndexDC(
             name=dc.name,
             description=dc.description,
-            point={
-              "lat": dc.latitude,
-              "lon": dc.longitude
-            },
+            point={"lat": dc.latitude, "lon": dc.longitude},
             country=dc.country,
             city=dc.city,
             original_full_address=dc.original_full_address,

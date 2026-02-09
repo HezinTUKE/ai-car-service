@@ -27,8 +27,12 @@ class OfferHandler(IndexAbstraction):
             car_types=[occ.car_type for occ in offer_dc.offer_car_compatibility],
         )
         translated_text = translate(offer_dc.description) if offer_dc.description else ""
-        offer_index_dc.format_embedding_text(service_name=self.service_name, city=self.city,
-                                             country=self.country.value, offer_description=translated_text)
+        offer_index_dc.format_embedding_text(
+            service_name=self.service_name,
+            city=self.city,
+            country=self.country.value,
+            offer_description=translated_text,
+        )
 
         try:
             await OfferIndex.create_or_update_document(offer_dc.offer_id, offer_index_dc.to_dict())

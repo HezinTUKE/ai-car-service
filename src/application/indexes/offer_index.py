@@ -20,7 +20,7 @@ class OfferIndex(BaseIndex):
                     "type": "knn_vector",
                     "dimension": 768,
                     "method": {"name": "hnsw", "space_type": "cosinesimil", "engine": "nmslib"},
-                }
+                },
             }
         },
     }

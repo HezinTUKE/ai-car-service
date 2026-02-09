@@ -10,8 +10,8 @@ class RagController:
     @staticmethod
     @router.get("/answer", response_model=RagResponseSchema)
     async def retrieve_rag_answer(
-            question: str,
-            user_latitude: float = None,
-            user_longitude: float = None,
+        question: str,
+        user_latitude: float = None,
+        user_longitude: float = None,
     ):
         return await RagHandler.rag_query(question, user_latitude, user_longitude)
